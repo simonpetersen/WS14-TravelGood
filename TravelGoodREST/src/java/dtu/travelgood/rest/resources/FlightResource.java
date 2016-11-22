@@ -5,6 +5,8 @@
  */
 package dtu.travelgood.rest.resources;
 
+import dtu.lameduck.AirlineReservationService;
+import dtu.lameduck.AirlineReservationService_Service;
 import dtu.lameduck.Flight;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,9 +29,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 public class FlightResource {
     
     private SimpleDateFormat format;
+    private AirlineReservationService airlineService;
     
     public FlightResource() {
         format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        airlineService = new AirlineReservationService_Service().getAirlineReservationServicePort();
     }
     
     // http://localhost:8080/tgREST/TravelGood/flight/list?start=cph&destination=nyc
