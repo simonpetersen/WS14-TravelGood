@@ -77,13 +77,8 @@ public class AirlineReservationService {
             @WebParam(name = "expirationYear") int expirationYear) throws Exception {
         if (!flights.containsKey(bookingNumber))
             throw new Exception("Invalid booking number.");
-        CreditCardInfoType creditcard = new CreditCardInfoType();
-        creditcard.setName(creditcardName);
-        creditcard.setNumber(creditcardNumber);
-        CreditCardInfoType.ExpirationDate exDate = new CreditCardInfoType.ExpirationDate();
-        exDate.setMonth(expirationMonth);
-        exDate.setYear(expirationYear);
-        creditcard.setExpirationDate(exDate);
+        CreditCardInfoType creditcard;
+        creditcard = createCreditCardInfo(creditcardNumber, creditcardName, expirationMonth, expirationYear);
         int price = flights.get(bookingNumber).getPrice();
         boolean validCreditCard = bankWebService.validateCreditCard(14, creditcard, price);
         if (!validCreditCard)
@@ -119,13 +114,8 @@ public class AirlineReservationService {
             @WebParam(name = "price") int price) throws Exception {
         if (!bookings.containsKey(bookingNumber) && !bookings.get(bookingNumber).contains(creditcardNumber))
             throw new Exception("Flight is not booked with creditcard number: "+creditcardNumber);
-        CreditCardInfoType creditcard = new CreditCardInfoType();
-        creditcard.setName(creditcardName);
-        creditcard.setNumber(creditcardNumber);
-        CreditCardInfoType.ExpirationDate exDate = new CreditCardInfoType.ExpirationDate();
-        exDate.setMonth(expirationMonth);
-        exDate.setYear(expirationYear);
-        creditcard.setExpirationDate(exDate);
+        CreditCardInfoType creditcard;
+        creditcard = createCreditCardInfo(creditcardNumber, creditcardName, expirationMonth, expirationYear);
         price = price / 2;
         boolean validCreditCard = bankWebService.validateCreditCard(14, creditcard, price);
         if (!validCreditCard)
@@ -135,5 +125,17 @@ public class AirlineReservationService {
         bankWebService.refundCreditCard(14, creditcard, price, account);
         bookings.get(bookingNumber).remove(creditcardNumber);
         return true;
+    }
+    
+    private CreditCardInfoType createCreditCardInfo(String creditcardNumber, String creditcardName, int expirationMonth, 
+            int expirationYear) {
+        CreditCardInfoType creditcard = new CreditCardInfoType();
+        creditcard.setName(creditcardName);
+        creditcard.setNumber(creditcardNumber);
+        CreditCardInfoType.ExpirationDate exDate = new CreditCardInfoType.ExpirationDate();
+        exDate.setMonth(expirationMonth);
+        exDate.setYear(expirationYear);
+        creditcard.setExpirationDate(exDate);
+        return creditcard;
     }
 }
