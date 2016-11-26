@@ -42,5 +42,21 @@
         <delete dir="${build.generated.sources.dir}/jax-ws/dtu/lameduck"/>
         <delete dir="${build.generated.dir}/jax-wsCache/AirlineReservationService"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-AirlineReservationService"/>
+    <target name="wsimport-client-HotelReservationService" depends="wsimport-init">
+        <mkdir dir="${build.generated.dir}/jax-wsCache/HotelReservationService"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/HotelReservationService" destdir="${build.generated.dir}/jax-wsCache/HotelReservationService" wsdl="${basedir}/${conf-dir}xml-resources/web-service-references/HotelReservationService/wsdl/localhost_8080/NiceView/HotelReservationService.wsdl" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://localhost:8080/NiceView/HotelReservationService?wsdl" xnocompile="true" xendorsed="true">
+            <depends file="${basedir}/${conf-dir}xml-resources/web-service-references/HotelReservationService/wsdl/localhost_8080/NiceView/HotelReservationService.wsdl"/>
+            <produces dir="${build.generated.dir}/jax-wsCache/HotelReservationService"/>
+        </wsimport>
+        <copy todir="${build.generated.sources.dir}/jax-ws">
+            <fileset dir="${build.generated.dir}/jax-wsCache/HotelReservationService">
+                <include name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="wsimport-client-clean-HotelReservationService" depends="-init-project">
+        <delete dir="${build.generated.sources.dir}/jax-ws/dtu/niceview"/>
+        <delete dir="${build.generated.dir}/jax-wsCache/HotelReservationService"/>
+    </target>
+    <target name="wsimport-client-generate" depends="wsimport-client-AirlineReservationService, wsimport-client-HotelReservationService"/>
 </project>

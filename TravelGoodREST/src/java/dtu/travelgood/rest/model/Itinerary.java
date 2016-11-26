@@ -6,11 +6,11 @@
 package dtu.travelgood.rest.model;
 
 import dtu.lameduck.Flight;
+import dtu.niceview.Hotel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -23,7 +23,7 @@ public class Itinerary {
     
     private String id;
     private List<Flight> flights;
-    private List<Integer> hotelBookings;
+    private List<Hotel> hotelBookings;
     private Status status;
 
     public Status getStatus() {
@@ -56,16 +56,16 @@ public class Itinerary {
         flights.add(flight);
     }
     
-    public void addHotel(int hotelBookingNumber) 
+    public void addHotel(Hotel hotel) 
     {
-        hotelBookings.add(hotelBookingNumber);
+        hotelBookings.add(hotel);
     }
     
     public List<Flight> getFlights() {
         return flights;
     }
     
-    public List<Integer> getHotels() {
+    public List<Hotel> getHotels() {
         return hotelBookings;
     }
     

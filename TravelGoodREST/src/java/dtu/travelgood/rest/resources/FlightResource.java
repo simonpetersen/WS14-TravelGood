@@ -8,12 +8,15 @@ package dtu.travelgood.rest.resources;
 import dtu.lameduck.AirlineReservationService;
 import dtu.lameduck.AirlineReservationService_Service;
 import dtu.lameduck.Flight;
+import dtu.lameduck.ParseException_Exception;
+import dtu.niceview.Hotel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -37,12 +40,11 @@ public class FlightResource {
     }
     
     // http://localhost:8080/tgREST/TravelGood/flight/list?start=cph&destination=nyc
-    @Path("list")
+    @Path("list/{start}/{destination}/{date}")
     @GET
-    public String getFlightList(@QueryParam("start") String start, 
-            @QueryParam("destination") String destination, @QueryParam("date") String date) {
-        //TODO: WS call
-        return "Flight from "+start+" to "+destination;
+    public List<Flight> getFlightList(@PathParam("start") String start, 
+            @PathParam("destination") String destination, @PathParam("date") String date) throws ParseException_Exception {
+        return airlineService.getFlights(start, destination, date);
     }
     
     @Path("add/{itineraryID}/{bookingNumber}/{start}/{destination}/{price}/{carrier}/{takeoff}/{landing}")
@@ -66,6 +68,20 @@ public class FlightResource {
         XMLGregorianCalendar landingXML = DatatypeFactory.newInstance().newXMLGregorianCalendar(landingCal);
         flight.setTakeoff(takoffXML); flight.setLanding(landingXML);
         ItineraryResource.itineraries.get(itineraryID).addFlight(flight);
+        return true;
+    }
+    
+    @Path("remove/{itineraryID}/{flightID}")
+    @POST
+    public boolean removeFlight(@PathParam("itineraryID") String itineraryID, @PathParam("flightID") int flightID) 
+            throws Exception {
+        if (!ItineraryResource.itineraries.containsKey(itineraryID))
+            throw new Exception("Invalid itinerary ID");
+        List<Flight> flights = ItineraryResource.itineraries.get(itineraryID).getFlights();
+        for (int i = 0; i < flights.size(); i++) {
+            if (flights.get(i).getBookingNr() == flightID)
+                flights.remove(i);
+        }
         return true;
     }
     

@@ -9,6 +9,9 @@ import dtu.lameduck.AirlineReservationService;
 import dtu.lameduck.AirlineReservationService_Service;
 import dtu.lameduck.Exception_Exception;
 import dtu.lameduck.Flight;
+import dtu.niceview.Hotel;
+import dtu.niceview.HotelReservationService;
+import dtu.niceview.HotelReservationService_Service;
 import dtu.travelgood.rest.model.Itinerary;
 import java.util.HashMap;
 import java.util.Random;
@@ -30,9 +33,11 @@ public class ItineraryResource {
     
     static HashMap<String, Itinerary> itineraries = initMap();
     private AirlineReservationService airlineService;
+    private HotelReservationService hotelService;
     
     public ItineraryResource() {
         airlineService = new AirlineReservationService_Service().getAirlineReservationServicePort();
+        hotelService = new HotelReservationService_Service().getHotelReservationServicePort();
     }
     
     @GET
@@ -63,8 +68,9 @@ public class ItineraryResource {
         for (Flight f : itinerary.getFlights()) {
             airlineService.bookFlight(f.getBookingNr(), creditcardNumber, creditcardName, month, year);
         }
-        for (int i : itinerary.getHotels()) {
+        for (Hotel h : itinerary.getHotels()) {
             // WS call to book hotels
+            hotelService.bookHotel(h.getBookingNumber(), creditcardNumber, creditcardName, month, year, true);
         }
         itinerary.setBookedStatus();
         return true;
@@ -81,8 +87,9 @@ public class ItineraryResource {
         for (Flight f : itinerary.getFlights()) {
             airlineService.cancelFlight(f.getBookingNr(), creditcardNumber, creditcardName, month, year, f.getPrice());
         }
-        for (int i : itinerary.getHotels()) {
+        for (Hotel h : itinerary.getHotels()) {
             // WS call to cancel hotels
+            hotelService.cancelHotel(h.getBookingNumber());
         }
         itinerary.setCanceledStatus();
         return true;
