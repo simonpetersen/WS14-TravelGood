@@ -85,7 +85,7 @@ public class ItineraryResource {
     }
     
     @DELETE
-    @Path("{id}")
+    @Path("cancel/{id}/{creditcardNumber}/{creditcardName}/{expirationMonth}/{expirationYear}")
     public boolean cancelItinerary(@PathParam("id") String id,
             @PathParam("creditcardNumber") String creditcardNumber, @PathParam("creditcardName") String creditcardName,
             @PathParam("expirationMonth") int month, @PathParam("expirationYear") int year) throws Exception {
@@ -93,15 +93,25 @@ public class ItineraryResource {
             throw new Exception("Invalid ID.");
         Itinerary itinerary = itineraries.get(id);
         for (FlightBooking f : itinerary.getFlights()) {
-            airlineService.cancelFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year, 
+            if (f.isIsBooked()) {
+                airlineService.cancelFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year, 
                     f.getFlight().getPrice());
-            f.setIsBooked(true);
+                f.setIsBooked(false);
+            }
         }
         for (HotelBooking h : itinerary.getHotels()) {
-            hotelService.cancelHotel(h.getHotel().getBookingNumber());
-            h.setIsBooked(true);
+            if (h.isIsBooked()) {
+                hotelService.cancelHotel(h.getHotel().getBookingNumber());
+                h.setIsBooked(false);
+            }
         }
         return true;
+    }
+    
+    @POST
+    @Path("reset")
+    public void resetItineraries() {
+        itineraries = initMap();
     }
     
     private static HashMap<String, Itinerary> initMap() {

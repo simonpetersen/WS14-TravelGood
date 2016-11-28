@@ -24,6 +24,7 @@ public class Itinerary {
     private String id;
     private List<FlightBooking> flights;
     private List<HotelBooking> hotelBookings;
+    private Status status;
     
     public Itinerary() {}
     
@@ -31,6 +32,7 @@ public class Itinerary {
         this.id = id;
         flights = new ArrayList<>();
         hotelBookings = new ArrayList<>();
+        status = Status.PLANNING;
     }
     
     public String getID() {
@@ -57,6 +59,18 @@ public class Itinerary {
     
     public List<HotelBooking> getHotels() {
         return hotelBookings;
+    }
+    
+    public Status getStatus() {
+        return status;
+    }
+    
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+    
+    private enum Status {
+        PLANNING, BOOKED, CANCELLED;
     }
     
 }
