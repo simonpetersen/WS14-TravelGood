@@ -26,14 +26,6 @@ public class HotelBooking {
         this.hotel = hotel;
         this.isBooked = false;
     }
-    
-    public void confirmBooking() {
-        this.isBooked = true;
-    }
-    
-    public boolean bookingIsConfirmed() {
-        return isBooked;
-    }
 
     public HotelREST getHotel() {
         return hotel;
@@ -42,5 +34,12 @@ public class HotelBooking {
     public void setHotel(HotelREST hotel) {
         this.hotel = hotel;
     }
-    
+
+    public boolean isIsBooked() {
+        return isBooked;
+    }
+
+    public void setIsBooked(boolean isBooked) {
+        this.isBooked = isBooked;
+    }
 }

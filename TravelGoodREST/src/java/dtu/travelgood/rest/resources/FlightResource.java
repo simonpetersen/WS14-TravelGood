@@ -40,16 +40,21 @@ public class FlightResource {
     // http://localhost:8080/tgREST/TravelGood/flight/list?start=cph&destination=nyc
     @Path("{start}/{destination}/{date}")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
-    public List<dtu.travelgood.rest.model.FlightREST> getFlightList(@PathParam("start") String start, 
+    public List<FlightREST> getFlightList(@PathParam("start") String start, 
             @PathParam("destination") String destination, @PathParam("date") String date) 
             throws ParseException_Exception, ParseException {
         List<FlightREST> retur = new ArrayList<>();
         List<Flight> flights = airlineService.getFlights(start, destination, date);
         for (Flight f : flights) {
-            FlightREST flight = new FlightREST(f.getStartAirport(), f.getDestination(), f.getCarrier(), f.getAirline(),
-            format.format(f.getTakeoff().toGregorianCalendar().getTime()), 
-            format.format(f.getLanding().toGregorianCalendar().getTime()), f.getBookingNr(), f.getPrice());
+            FlightREST flight = new FlightREST();
+            flight.setAirline(f.getAirline());
+            flight.setBookingNr(f.getBookingNr());
+            flight.setCarrier(f.getCarrier());
+            flight.setLanding(f.getLanding().toGregorianCalendar().getTime());
+            flight.setTakeoff(f.getTakeoff().toGregorianCalendar().getTime());
+            flight.setPrice(f.getPrice());
+            flight.setStartAirport(f.getStartAirport());
+            flight.setDestination(f.getDestination());
             retur.add(flight);
         }
         return retur;
@@ -64,7 +69,15 @@ public class FlightResource {
             @PathParam("takeoff") String takeoff, @PathParam("landing") String landing) throws Exception {
         if (!ItineraryResource.itineraries.containsKey(itineraryID))
             throw new Exception("Invalid itinerary-ID.");
-        FlightREST flight = new FlightREST(start, destination, carrier, airline, takeoff, landing, bookingNumber, price);
+        FlightREST flight = new FlightREST();
+        flight.setAirline(airline);
+        flight.setBookingNr(bookingNumber);
+        flight.setCarrier(carrier);
+        flight.setDestination(destination);
+        flight.setLanding(format.parse(landing));
+        flight.setPrice(price);
+        flight.setStartAirport(start);
+        flight.setTakeoff(format.parse(takeoff));
         FlightBooking booking = new FlightBooking(flight);
         ItineraryResource.itineraries.get(itineraryID).addFlight(booking);
         return true;

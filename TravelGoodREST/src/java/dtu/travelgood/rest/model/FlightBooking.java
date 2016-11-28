@@ -26,14 +26,6 @@ public class FlightBooking {
         this.flight = flight;
         this.isBooked = false;
     }
-    
-    public void confirmBooking() {
-        this.isBooked = true;
-    }
-    
-    public boolean bookingIsConfirmed() {
-        return isBooked;
-    }
 
     public FlightREST getFlight() {
         return flight;
@@ -43,4 +35,11 @@ public class FlightBooking {
         this.flight = flight;
     }
     
+       public boolean isIsBooked() {
+        return isBooked;
+    }
+
+    public void setIsBooked(boolean isBooked) {
+        this.isBooked = isBooked;
+    }
 }
