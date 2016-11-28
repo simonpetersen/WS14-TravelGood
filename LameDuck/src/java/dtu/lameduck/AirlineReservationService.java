@@ -114,7 +114,7 @@ public class AirlineReservationService {
             @WebParam(name = "expirationMonth") int expirationMonth,
             @WebParam(name = "expirationYear") int expirationYear, 
             @WebParam(name = "price") int price) throws Exception {
-        if (!bookings.containsKey(bookingNumber) && !bookings.get(bookingNumber).contains(creditcardNumber))
+        if (!bookings.containsKey(bookingNumber) || !bookings.get(bookingNumber).contains(creditcardNumber))
             throw new Exception("Flight is not booked with creditcard number: "+creditcardNumber);
         CreditCardInfoType creditcard;
         creditcard = createCreditCardInfo(creditcardNumber, creditcardName, expirationMonth, expirationYear);
