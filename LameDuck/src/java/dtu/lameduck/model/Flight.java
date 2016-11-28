@@ -7,7 +7,6 @@ package dtu.lameduck.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -21,12 +20,10 @@ public class Flight {
     private Date takeoff, landing;
     private int bookingNr, price;
     private SimpleDateFormat format;
-    private GregorianCalendar gCalendar;
-    
+        
     public Flight(String start, String destination, String carrier, String airline,
             String takeoff, String landing, int bookingNr, int price) {
-        this.format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        gCalendar = new GregorianCalendar();
+        this.format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         this.startAirport = start;
         this.destination = destination;
         this.carrier = carrier;
@@ -34,7 +31,7 @@ public class Flight {
         try {
             this.takeoff = format.parse(takeoff);
             this.landing = format.parse(landing);
-        } catch (ParseException ex) { ex.printStackTrace(); }
+        } catch (ParseException ex) { System.out.println(ex.getMessage()); }
         this.bookingNr = bookingNr;
         this.price  = price;
     }
@@ -63,13 +60,14 @@ public class Flight {
         this.carrier = carrier;
     }
 
-    public String getAirlineResService() {
+    public String getAirline() {
         return airline;
     }
 
     public void setAirline(String airline) {
         this.airline = airline;
     }
+
 
     public Date getTakeoff() {
         return takeoff;

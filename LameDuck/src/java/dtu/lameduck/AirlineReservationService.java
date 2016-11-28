@@ -37,13 +37,16 @@ public class AirlineReservationService {
     private DateFormat format;
     
     public AirlineReservationService() {
-        format = new SimpleDateFormat("dd/MM/yyyy");
+        format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         bankWebService = new BankSecureService().getBankSecurePort();
-        Flight f = new Flight("CPH", "NYC", "Aviator", "SAS", "28/11/2016 10:25:00", 
-                "28/11/2016 21:30:00", 10, 3699);
+        Flight f = new Flight("CPH", "NYC", "Aviator", "SAS", "28-11-2016 10:25:00", 
+                "28-11-2016 21:30:00", 10, 3699);
         flights.put(f.getBookingNr(), f);
-        f = new Flight("CPH", "NYC", "Aviator", "Norwegian", "28/11/2016 06:45:00", 
-                "28/11/2016 17:15:00", 11, 1057);
+        f = new Flight("Athens", "CPH", "Aviator", "Norwegian", "10-12-2016 06:45:00", 
+                "10-12-2016 12:10:00", 11, 1057);
+        flights.put(f.getBookingNr(), f);
+        f = new Flight("NYC", "Athens", "Aviator", "American Airlines", "04-12-2016 09:50:00", "04-12-2016 20:30:00", 
+                12, 3999);
         flights.put(f.getBookingNr(), f);
     }
     
@@ -51,11 +54,10 @@ public class AirlineReservationService {
     public List<Flight> getFlights(@WebParam(name = "start") String start, 
             @WebParam(name = "destination") String destination, 
             @WebParam(name = "date") String date) throws ParseException {
-        Date travelDate = format.parse(date);
         List<Flight> retur = new ArrayList<>();
         for (Flight f : flights.values()) {
-            if (f.getStartAirport().equals(start) && f.getDestination().equals(destination) &&
-                    f.getTakeoff().compareTo(travelDate) == 0);
+            String takeoff = format.format(f.getTakeoff());
+            if (f.getStartAirport().equals(start) && f.getDestination().equals(destination) && takeoff.contains(date))
                 retur.add(f);
         }
         return retur;
