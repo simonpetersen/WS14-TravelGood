@@ -4,6 +4,15 @@
 <xsd:import namespace="http://niceview.dtu/" schemaLocation="http://localhost:8080/NiceView/HotelReservationService?xsd=1"/>
 </xsd:schema>
 </types>
+<message name="getHotels">
+<part name="parameters" element="tns:getHotels"/>
+</message>
+<message name="getHotelsResponse">
+<part name="parameters" element="tns:getHotelsResponse"/>
+</message>
+<message name="ParseException">
+<part name="fault" element="tns:ParseException"/>
+</message>
 <message name="bookHotel">
 <part name="parameters" element="tns:bookHotel"/>
 </message>
@@ -19,16 +28,12 @@
 <message name="cancelHotelResponse">
 <part name="parameters" element="tns:cancelHotelResponse"/>
 </message>
-<message name="getHotels">
-<part name="parameters" element="tns:getHotels"/>
-</message>
-<message name="getHotelsResponse">
-<part name="parameters" element="tns:getHotelsResponse"/>
-</message>
-<message name="ParseException">
-<part name="fault" element="tns:ParseException"/>
-</message>
 <portType name="HotelReservationService">
+<operation name="getHotels">
+<input wsam:Action="http://niceview.dtu/HotelReservationService/getHotelsRequest" message="tns:getHotels"/>
+<output wsam:Action="http://niceview.dtu/HotelReservationService/getHotelsResponse" message="tns:getHotelsResponse"/>
+<fault message="tns:ParseException" name="ParseException" wsam:Action="http://niceview.dtu/HotelReservationService/getHotels/Fault/ParseException"/>
+</operation>
 <operation name="bookHotel">
 <input wsam:Action="http://niceview.dtu/HotelReservationService/bookHotelRequest" message="tns:bookHotel"/>
 <output wsam:Action="http://niceview.dtu/HotelReservationService/bookHotelResponse" message="tns:bookHotelResponse"/>
@@ -39,14 +44,21 @@
 <output wsam:Action="http://niceview.dtu/HotelReservationService/cancelHotelResponse" message="tns:cancelHotelResponse"/>
 <fault message="tns:Exception" name="Exception" wsam:Action="http://niceview.dtu/HotelReservationService/cancelHotel/Fault/Exception"/>
 </operation>
-<operation name="getHotels">
-<input wsam:Action="http://niceview.dtu/HotelReservationService/getHotelsRequest" message="tns:getHotels"/>
-<output wsam:Action="http://niceview.dtu/HotelReservationService/getHotelsResponse" message="tns:getHotelsResponse"/>
-<fault message="tns:ParseException" name="ParseException" wsam:Action="http://niceview.dtu/HotelReservationService/getHotels/Fault/ParseException"/>
-</operation>
 </portType>
 <binding name="HotelReservationServicePortBinding" type="tns:HotelReservationService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+<operation name="getHotels">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="ParseException">
+<soap:fault name="ParseException" use="literal"/>
+</fault>
+</operation>
 <operation name="bookHotel">
 <soap:operation soapAction=""/>
 <input>
@@ -69,18 +81,6 @@
 </output>
 <fault name="Exception">
 <soap:fault name="Exception" use="literal"/>
-</fault>
-</operation>
-<operation name="getHotels">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="ParseException">
-<soap:fault name="ParseException" use="literal"/>
 </fault>
 </operation>
 </binding>

@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Itinerary {
     
     private String id;
-    private List<Flight> flights;
-    private List<Hotel> hotelBookings;
+    private List<FlightBooking> flights;
+    private List<HotelBooking> hotelBookings;
     private Status status;
 
     public Status getStatus() {
@@ -51,21 +51,21 @@ public class Itinerary {
         this.id = id;
     }
     
-    public void addFlight(Flight flight) 
+    public void addFlight(FlightBooking flight) 
     {
         flights.add(flight);
     }
     
-    public void addHotel(Hotel hotel) 
+    public void addHotel(HotelBooking hotel) 
     {
         hotelBookings.add(hotel);
     }
     
-    public List<Flight> getFlights() {
+    public List<FlightBooking> getFlights() {
         return flights;
     }
     
-    public List<Hotel> getHotels() {
+    public List<HotelBooking> getHotels() {
         return hotelBookings;
     }
     

@@ -36,7 +36,8 @@
 <xs:element name="creditCardGuaranteedRequired" type="xs:boolean"/>
 <xs:element name="hotelAddress" type="xs:string" minOccurs="0"/>
 <xs:element name="hotelName" type="xs:string" minOccurs="0"/>
-<xs:element name="price" type="xs:int"/>
+<xs:element name="priceOfOneNight" type="xs:int"/>
+<xs:element name="priceTotal" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 
