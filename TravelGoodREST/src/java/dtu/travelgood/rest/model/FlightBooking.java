@@ -15,16 +15,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlightBooking {
+public class FlightBooking extends Booking {
     
     private FlightREST flight;
-    private boolean isBooked;
     
     public FlightBooking() {}
     
     public FlightBooking(FlightREST flight) {
+        super();
         this.flight = flight;
-        this.isBooked = false;
     }
 
     public FlightREST getFlight() {
@@ -33,13 +32,5 @@ public class FlightBooking {
 
     public void setFlight(FlightREST flight) {
         this.flight = flight;
-    }
-    
-       public boolean isIsBooked() {
-        return isBooked;
-    }
-
-    public void setIsBooked(boolean isBooked) {
-        this.isBooked = isBooked;
     }
 }

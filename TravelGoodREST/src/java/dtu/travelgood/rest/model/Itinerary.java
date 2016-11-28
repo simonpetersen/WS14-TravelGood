@@ -69,8 +69,32 @@ public class Itinerary {
         this.status = status;
     }
     
+    public void setBookedStatus() {
+        this.status = Status.BOOKED;
+    }
+    
+    public void setActiveStats() {
+        this.status = Status.ACTIVE;
+    }
+    
+    public void setCancelledStatus() {
+        this.status = Status.CANCELLED;
+    }
+    
+    public boolean statusIsPlanning() {
+        return status == Status.PLANNING;
+    }
+    
+    public boolean statusIsBooked() {
+        return status == Status.BOOKED;
+    }
+    
+    public boolean statusIsCancelled() {
+        return status == Status.CANCELLED;
+    }
+    
     private enum Status {
-        PLANNING, BOOKED, CANCELLED;
+        PLANNING, ACTIVE, BOOKED, CANCELLED;
     }
     
 }

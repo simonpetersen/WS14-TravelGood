@@ -7,6 +7,7 @@ package dtu.travelgood.rest.resources;
 
 import dtu.lameduck.AirlineReservationService;
 import dtu.lameduck.AirlineReservationService_Service;
+import dtu.lameduck.Exception_Exception;
 import dtu.niceview.HotelReservationService;
 import dtu.niceview.HotelReservationService_Service;
 import dtu.travelgood.rest.model.FlightBooking;
@@ -16,12 +17,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -66,46 +70,65 @@ public class ItineraryResource {
     
     @PUT
     @Path("/book/{id}/{creditcardNumber}/{creditcardName}/{expirationMonth}/{expirationYear}")
-    public boolean bookItinerary(@PathParam("id") String id, 
+    public Response bookItinerary(@PathParam("id") String id, 
             @PathParam("creditcardNumber") String creditcardNumber, @PathParam("creditcardName") String creditcardName,
-            @PathParam("expirationMonth") int month, @PathParam("expirationYear") int year) throws Exception {
+            @PathParam("expirationMonth") int month, @PathParam("expirationYear") int year) {
         if (!itineraries.containsKey(id))
-            throw new Exception("Invalid ID.");
+            return Response.status(Response.Status.FORBIDDEN).entity("Invalid id!").build();
         Itinerary itinerary = itineraries.get(id);
         for (FlightBooking f : itinerary.getFlights()) {
-            airlineService.bookFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year);
-            f.setIsBooked(true);
-        }
+            try {
+                airlineService.bookFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year);
+                f.setConfirmedStatus();
+            } catch (Exception_Exception ex) {
+                f.setCancelledStatus();
+                cancelBookings(itinerary, creditcardName, creditcardNumber, month, year);
+                return Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
+            }
+            }
         for (HotelBooking h : itinerary.getHotels()) {
-            hotelService.bookHotel(h.getHotel().getBookingNumber(), creditcardNumber, creditcardName, month, 
-                    year, h.getHotel().isCreditCardGuaranteedRequired());
-            h.setIsBooked(true);
+            try {
+                hotelService.bookHotel(h.getHotel().getBookingNumber(), creditcardNumber, creditcardName, month,
+                        year, h.getHotel().isCreditCardGuaranteedRequired());
+                h.setConfirmedStatus();
+            } catch (dtu.niceview.Exception_Exception ex) {
+                h.setCancelledStatus();
+                cancelBookings(itinerary, creditcardName, creditcardNumber, month, year);
+                return Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
+            }
         }
-        return true;
+        itinerary.setBookedStatus();
+        return Response.ok().build();
     }
     
     @DELETE
     @Path("cancel/{id}/{creditcardNumber}/{creditcardName}/{expirationMonth}/{expirationYear}")
-    public boolean cancelItinerary(@PathParam("id") String id,
+    public Response cancelItinerary(@PathParam("id") String id,
             @PathParam("creditcardNumber") String creditcardNumber, @PathParam("creditcardName") String creditcardName,
             @PathParam("expirationMonth") int month, @PathParam("expirationYear") int year) throws Exception {
         if (!itineraries.containsKey(id))
             throw new Exception("Invalid ID.");
+        boolean faultOccured = false;
         Itinerary itinerary = itineraries.get(id);
         for (FlightBooking f : itinerary.getFlights()) {
-            if (f.isIsBooked()) {
+            if (f.statusIsUnconfirmed()) {
                 airlineService.cancelFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year, 
                     f.getFlight().getPrice());
-                f.setIsBooked(false);
-            }
+                f.setCancelledStatus();
+            } else
+                faultOccured = true;
         }
         for (HotelBooking h : itinerary.getHotels()) {
-            if (h.isIsBooked()) {
+            if (h.statusIsConfirmed()) {
                 hotelService.cancelHotel(h.getHotel().getBookingNumber());
-                h.setIsBooked(false);
-            }
+                h.setCancelledStatus();
+            } else
+                faultOccured = true;
         }
-        return true;
+        itinerary.setCancelledStatus();
+        if (faultOccured) return Response.status(Response.Status.METHOD_NOT_ALLOWED)
+                        .entity("An error occured").build();
+        return Response.ok().build();
     }
     
     @POST
@@ -123,6 +146,31 @@ public class ItineraryResource {
         i = new Itinerary("4357");
         itineraries.put(i.getID(), i);
         return itineraries;
+    }
+    
+    private void cancelBookings(Itinerary itinerary, String creditcardNumber, String creditcardName, int month, int year) {
+        for (FlightBooking f : itinerary.getFlights()) {
+            if (f.statusIsConfirmed()) {
+                try {
+                    airlineService.cancelFlight(f.getFlight().getBookingNr(), creditcardNumber, creditcardName, month, year,
+                            f.getFlight().getPrice());
+                } catch (Exception_Exception ex) {
+                    Logger.getLogger(ItineraryResource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                f.setCancelledStatus();
+            }
+        }
+        for (HotelBooking h : itinerary.getHotels()) {
+            if (h.statusIsConfirmed()) {
+                try {
+                    hotelService.cancelHotel(h.getHotel().getBookingNumber());
+                } catch (dtu.niceview.Exception_Exception ex) {
+                    Logger.getLogger(ItineraryResource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                h.setCancelledStatus();
+            } 
+        }
+        itinerary.setActiveStats();
     }
 
 }

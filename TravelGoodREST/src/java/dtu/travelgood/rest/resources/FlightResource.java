@@ -22,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 /**
  *
  * @author Simon
@@ -62,13 +63,15 @@ public class FlightResource {
     
     @Path("{itineraryID}/{bookingNumber}/{start}/{destination}/{price}/{carrier}/{airline}/{takeoff}/{landing}")
     @PUT
-    public boolean addFlight(@PathParam("itineraryID") String itineraryID, 
+    public Response addFlight(@PathParam("itineraryID") String itineraryID, 
             @PathParam("bookingNumber") int bookingNumber, @PathParam("start") String start, 
             @PathParam("destination") String destination, @PathParam("price") int price,
             @PathParam("carrier") String carrier, @PathParam("airline") String airline,
-            @PathParam("takeoff") String takeoff, @PathParam("landing") String landing) throws Exception {
+            @PathParam("takeoff") String takeoff, @PathParam("landing") String landing) throws ParseException {
         if (!ItineraryResource.itineraries.containsKey(itineraryID))
-            throw new Exception("Invalid itinerary-ID.");
+            return Response.status(Response.Status.NOT_FOUND).entity("Invalid ID!").build();
+        if (!ItineraryResource.itineraries.get(itineraryID).statusIsPlanning())
+            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         FlightREST flight = new FlightREST();
         flight.setAirline(airline);
         flight.setBookingNr(bookingNumber);
@@ -80,21 +83,22 @@ public class FlightResource {
         flight.setTakeoff(format.parse(takeoff));
         FlightBooking booking = new FlightBooking(flight);
         ItineraryResource.itineraries.get(itineraryID).addFlight(booking);
-        return true;
+        return Response.ok().build();
     }
     
     @Path("{itineraryID}/{flightID}")
     @DELETE
-    public boolean removeFlight(@PathParam("itineraryID") String itineraryID, @PathParam("flightID") int flightID) 
-            throws Exception {
+    public Response removeFlight(@PathParam("itineraryID") String itineraryID, @PathParam("flightID") int flightID) {
         if (!ItineraryResource.itineraries.containsKey(itineraryID))
-            throw new Exception("Invalid itinerary ID");
+            return Response.status(Response.Status.NOT_FOUND).entity("Invalid ID!").build();
         List<FlightBooking> flights = ItineraryResource.itineraries.get(itineraryID).getFlights();
         for (int i = 0; i < flights.size(); i++) {
-            if (flights.get(i).getFlight().getBookingNr() == flightID)
+            if (flights.get(i).getFlight().getBookingNr() == flightID) {
                 flights.remove(i);
+                return Response.ok().build();
+            }
         }
-        return true;
+        return Response.status(Response.Status.NOT_FOUND).entity("Flight not added to itinerary").build();
     }
     
 }
